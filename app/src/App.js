@@ -1,46 +1,55 @@
 import React from 'react';
-import './App.css';
-import Home from  './Home';
 
-
-import About from './About';
-import Contact from './Contact';
-import Linkbar from './Linkbar';
-import QualifiedPrograms from './QualifiedPrograms';
-
-
+import Home from  'Home';
+import SearchCases from './cases/SearchCases';
+import Cases from './cases/Cases';
+import CaseDetail from './cases/CaseDetail';
+import Flags from './cases/Flags';
+import About from 'About';
+import Login from 'Login';
+import PrivateRoute from 'PrivateRoute';
+import Contact from 'Contact';
+import Linkbar from 'Linkbar';
+import QualifiedPrograms from 'QualifiedPrograms';
 
 import { createStore, combineReducers, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
 
+import history from './history';
 import createHistory from 'history/createBrowserHistory'
-import { Route } from 'react-router'
-
+import { Route, Switch, Redirect } from 'react-router';
 import { ConnectedRouter, routerReducer, routerMiddleware } from 'react-router-redux'
-import answers from './reducers/answers';
-import data from './reducers/data';
-import eligiblePrograms from './reducers/eligiblePrograms';
+
+import answers from 'reducers/answers';
+import data from 'reducers/data';
+import auth from 'reducers/auth';
+import eligiblePrograms from 'reducers/eligiblePrograms';
+import cases from 'cases/reducers';
+
 import 'bootstrap/dist/css/bootstrap.css';
 
 import logger from 'redux-logger';
-import thunk from 'redux-thunk'
-// Create a history of your choosing (we're using a browser history in this case)
-const history = createHistory()
+import thunk from 'redux-thunk';
+import { reducer as formReducer } from 'redux-form'
+
+import {Container} from 'reactstrap';
 
 // Build the middleware for intercepting and dispatching navigation actions
 const middleware = routerMiddleware(history)
 
-
-
+const mWare = process.env.NODE_ENV === 'development' ?  applyMiddleware(middleware, thunk, logger) : applyMiddleware(middleware, thunk)
 // Add the reducer to your store on the `routing` key
 const store = createStore(
   combineReducers({
     answers,
+    auth,
     data,
     eligiblePrograms,
-    routing: routerReducer
+    routing: routerReducer,
+    form: formReducer,
+    cases
   }),
-  applyMiddleware(middleware, thunk, logger)
+  mWare
 )
 
 const App = () => {
@@ -50,10 +59,20 @@ const App = () => {
       <ConnectedRouter history={history}>
         <div>
           <Linkbar />
-          <Route exact path="/" component={Home}/>
-          <Route exact path="/About" component={About} />
-          <Route exact path="/Contact" component={Contact} />
-          <Route exact path="/QualifiedPrograms" component={QualifiedPrograms} />
+          <Container>
+            <Switch>
+              <PrivateRoute exact path="/" component={SearchCases}/>
+              <PrivateRoute exact path="/cases" component={Cases}></PrivateRoute>
+              <PrivateRoute exact path="/cases/:selectedCase" component={CaseDetail}></PrivateRoute>
+              <PrivateRoute exact path="/flags/:selectedCase" component={Flags}></PrivateRoute>
+              <Route path="/login" component={Login}/>
+              <Route path="/about" component={About} />
+              <Route path="/contact" component={Contact} />
+              <PrivateRoute exact path="/questions/:selectedCase" component={Home}></PrivateRoute>
+              <PrivateRoute path="/qualifiedprograms/:selectedCase" component={QualifiedPrograms} />
+              <Redirect to="/" />
+            </Switch>
+          </Container>
         </div>
       </ConnectedRouter>
     </Provider>

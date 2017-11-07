@@ -11,10 +11,10 @@ import {
     CardTitle
 } from 'reactstrap';
 import { connect } from "react-redux";
-import * as AnswerActions from '../actions/answers'
-import translation from '../translation';
+import * as AnswerActions from 'actions/answers'
+import translation from 'translation';
 
-class Question extends React.Component {
+export class Question extends React.Component {
 
     constructor(props) {
         super(props);
@@ -50,7 +50,7 @@ class Question extends React.Component {
                 {
                     this.props.answer.options.map((answer) => {
                         return (
-                            <FormGroup key={answer + 'FormItem'} check key={answer}>
+                            <FormGroup check key={answer}>
                                 <Label check>
                                 <Input type="radio" checked={this.props.currentResponse === false} name={this.props.current} onClick={() => this.answerQuestion(answer)} />
                                 {' ' + translation.t(answer)}
