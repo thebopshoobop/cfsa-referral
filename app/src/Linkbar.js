@@ -15,7 +15,7 @@ import {
 import { LinkContainer } from "react-router-bootstrap";
 import { setLanguage } from "translation";
 
-class Linkbar extends Component {
+export default class Linkbar extends Component {
   constructor(props) {
     super(props);
 
