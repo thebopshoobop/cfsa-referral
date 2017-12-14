@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import translation from 'translation';
 import { connect } from 'react-redux';
 import {
   Container,
@@ -25,7 +26,7 @@ export const Login = props => {
     login,
   } = props;
   
-  const redirectPath = props.location.state ? props.location.state.from.pathname : '/';
+  const redirectPath = '/';
 
   const onChange = e => {
     e.preventDefault();
@@ -50,7 +51,7 @@ export const Login = props => {
   );
 
   const renderLogin = () => (
-    <Container>
+    <div>
       <Row>
         <Col xs={1} md={3}></Col>
         <Col xs={10} md={6}>
@@ -59,37 +60,33 @@ export const Login = props => {
         <Col xs={1} md={3}></Col>
       </Row>
       <Row>
-        <Col xs={0} md={2} />
-        <Col xs={12} md={8}>
+        <Col md={12}>
           <h1>Login</h1>
           <p>
             This application is to assist in the identification of relevant programs for
             vulnerable familes. Please login using your Social Worker ID.
           </p>
         </Col>
-        <Col xs={0} md={2} />
       </Row>
       <Row>
-        <Col xs={1} md={2} />
-        <Col xs={10} md={8}>
+        <Col md={12}>
           <Form onSubmit={onSubmit}>
             <FormGroup>
             <Label for="userId">Enter Your ID</Label>
-            <Input 
-              type="password" 
-              name="userId" 
-              id="userId" 
+            <Input
+              type="password"
+              name="userId"
+              id="userId"
               placeholder="eg. 07734..."
               value={userInput}
               onChange={onChange}
             />
             </FormGroup>
-          <Button color="danger">Login</Button>
+          <Button color="danger">{translation.t('LOGIN')}</Button>
           </Form>
         </Col>
-        <Col xs={1} md={2} />
       </Row>
-    </Container>
+    </div>
   );
 
   return isPending ? renderPending() : renderLogin();

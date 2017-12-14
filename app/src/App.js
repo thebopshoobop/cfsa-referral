@@ -16,38 +16,83 @@ import { Route, Switch, Redirect } from "react-router";
 
 import "bootstrap/dist/css/bootstrap.css";
 
-import { Container } from "reactstrap";
+import answers from "reducers/answers";
+import data from "reducers/data";
+import auth from "reducers/auth";
+import eligiblePrograms from "reducers/eligiblePrograms";
+import cases from "cases/reducers";
+
+import "bootstrap/dist/css/bootstrap.css";
+
+import logger from "redux-logger";
+import thunk from "redux-thunk";
+import { reducer as formReducer } from "redux-form";
+
+import { Container, Row, Col } from "reactstrap";
+
+// Build the middleware for intercepting and dispatching navigation actions
+const middleware = routerMiddleware(history);
+
+const mWare =
+  process.env.NODE_ENV === "development"
+    ? applyMiddleware(middleware, thunk, logger)
+    : applyMiddleware(middleware, thunk);
+// Add the reducer to your store on the `routing` key
+const store = createStore(
+  combineReducers({
+    answers,
+    auth,
+    data,
+    eligiblePrograms,
+    routing: routerReducer,
+    form: formReducer,
+    cases
+  }),
+  mWare
+);
 
 const App = () => {
   return (
-    <div>
-      <Linkbar />
-      <Container>
-        <Switch>
-          <PrivateRoute exact path="/" component={SearchCases} />
-          <PrivateRoute exact path="/cases" component={Cases} />
-          <PrivateRoute
-            exact
-            path="/cases/:selectedCase"
-            component={CaseDetail}
-          />
-          <PrivateRoute exact path="/flags/:selectedCase" component={Flags} />
-          <Route path="/login" component={Login} />
-          <Route path="/about" component={About} />
-          <Route path="/contact" component={Contact} />
-          <PrivateRoute
-            exact
-            path="/questions/:selectedCase"
-            component={Home}
-          />
-          <PrivateRoute
-            path="/qualifiedprograms/:selectedCase"
-            component={QualifiedPrograms}
-          />
-          <Redirect to="/" />
-        </Switch>
-      </Container>
-    </div>
+    <Provider store={store}>
+      {/* ConnectedRouter will use the store from Provider automatically */}
+      <ConnectedRouter history={history}>
+        <div>
+          <Linkbar history={history} />
+          <Row>
+            <Col xs={0} md={3} />
+            <Col xs={12} md={6}>
+              <Switch>
+                <PrivateRoute exact path="/" component={SearchCases} />
+                <PrivateRoute exact path="/cases" component={Cases} />
+                <PrivateRoute
+                  exact
+                  path="/cases/:selectedCase"
+                  component={CaseDetail}
+                />
+                <PrivateRoute
+                  exact
+                  path="/flags/:selectedCase"
+                  component={Flags}
+                />
+                <Route path="/login" component={Login} />
+                <Route path="/about" component={About} />
+                <Route path="/contact" component={Contact} />
+                <PrivateRoute
+                  path="/questions/:selectedCase/:question"
+                  component={Home}
+                />
+                <PrivateRoute
+                  path="/qualifiedprograms/:selectedCase"
+                  component={QualifiedPrograms}
+                />
+                <Redirect to="/" />
+              </Switch>
+            </Col>
+            <Col xs={0} md={3} />
+          </Row>
+        </div>
+      </ConnectedRouter>
+    </Provider>
   );
 };
 
